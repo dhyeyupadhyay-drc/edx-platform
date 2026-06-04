@@ -108,9 +108,7 @@ def marketing_link_context_processor(request):
 
     return {
         "MKTG_URL_" + k: marketing_link(k)
-        for k in (
-            settings.MKTG_URL_LINK_MAP.keys() | marketing_urls.keys()
-        )
+        for k in marketing_urls.keys()
     }
 
 
