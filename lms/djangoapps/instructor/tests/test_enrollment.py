@@ -902,7 +902,8 @@ class TestGetEmailParamsCCX(SharedModuleStoreTestCase):
             site,
             self.course_key
         )
-        self.course_about_url = self.course_url + 'about'
+        # get_link_for_about_page uses course.id (parent course), not the CCX key
+        self.course_about_url = f'{settings.LMS_ROOT_URL}/courses/{self.course.id}/about'
         self.registration_url = f'https://{site}/register'
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
@@ -939,30 +940,15 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
             site,
             str(cls.course.id)
         )
-        cls.course_about_url = cls.course_url + 'about'
         cls.registration_url = f'https://{site}/register'
         cls.logo_url = get_logo_url_for_email()
+        cls.course_about_url = f'{settings.LMS_ROOT_URL}/courses/{cls.course.id}/about'
 
     def test_normal_params(self):
-        # For a normal site, what do we expect to get for the URLs?
-        # Also make sure `auto_enroll` is properly passed through.
         result = get_email_params(self.course, False)
 
         assert result['auto_enroll'] is False
         assert result['course_about_url'] == self.course_about_url
-        assert result['registration_url'] == self.registration_url
-        assert result['course_url'] == self.course_url
-        assert result['logo_url'] == self.logo_url
-
-    def test_marketing_params(self):
-        # For a site with a marketing front end, what do we expect to get for the URLs?
-        # Also make sure `auto_enroll` is properly passed through.
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
-            result = get_email_params(self.course, True)
-
-        assert result['auto_enroll'] is True
-        # We should *not* get a course about url (LMS doesn't know what the marketing site URLs are)
-        assert result['course_about_url'] is None
         assert result['registration_url'] == self.registration_url
         assert result['course_url'] == self.course_url
         assert result['logo_url'] == self.logo_url

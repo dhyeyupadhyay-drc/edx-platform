@@ -1325,7 +1325,6 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
             assert 'This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org' in body
 
     @ddt.data('http', 'https')
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_enroll_email_not_registered_mktgsite(self, protocol):
         url = reverse('students_update_enrollment', kwargs={'course_id': str(self.course.id)})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True}
@@ -1607,16 +1606,13 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
             assert 'This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org' in body
 
     @patch('lms.djangoapps.instructor.enrollment.uses_shib')
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_enroll_email_not_registered_shib_mktgsite(self, mock_uses_shib):
-        # Try with marketing site enabled and shib on
+        # Try with shib on
         mock_uses_shib.return_value = True
 
         url = reverse('students_update_enrollment', kwargs={'course_id': str(self.course.id)})
-        # Try with marketing site enabled
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
-            response = self.client.post(url, {'identifiers': self.notregistered_email, 'action': 'enroll',
-                                              'email_students': True})
+        response = self.client.post(url, {'identifiers': self.notregistered_email, 'action': 'enroll',
+                                          'email_students': True})
 
         assert response.status_code == 200
 
@@ -2332,7 +2328,6 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 student_email=self.notenrolled_student.email,
             ) in body
 
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_add_notenrolled_email_mktgsite(self):
         # Try with marketing site enabled
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': str(self.course.id)})
