@@ -886,6 +886,8 @@ class TestGetEmailParamsCCX(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create()
+        # get_link_for_about_page uses course.id (parent course), not the CCX key
+        cls.course_about_url = f'{settings.LMS_ROOT_URL}/courses/{cls.course.id}/about'
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
     def setUp(self):
@@ -902,8 +904,6 @@ class TestGetEmailParamsCCX(SharedModuleStoreTestCase):
             site,
             self.course_key
         )
-        # get_link_for_about_page uses course.id (parent course), not the CCX key
-        self.course_about_url = f'{settings.LMS_ROOT_URL}/courses/{self.course.id}/about'
         self.registration_url = f'https://{site}/register'
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
