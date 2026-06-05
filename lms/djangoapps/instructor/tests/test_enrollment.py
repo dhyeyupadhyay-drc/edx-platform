@@ -953,6 +953,12 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
         assert result['course_url'] == self.course_url
         assert result['logo_url'] == self.logo_url
 
+    def test_auto_enroll_params(self):
+        result = get_email_params(self.course, True)
+
+        assert result['auto_enroll'] is True
+        assert result['course_about_url'] == self.course_about_url
+
     @patch('lms.djangoapps.instructor.enrollment.get_logo_url_for_email', return_value='https://www.logo.png')
     def test_logo_url_params(self, mock_get_logo_url_for_email):
         # Verify that the logo_url is correctly set in the email params
