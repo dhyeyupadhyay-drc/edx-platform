@@ -52,7 +52,7 @@ def index(request):
         settings.MKTG_URLS
     )
     root_url = marketing_urls.get("ROOT")
-    if root_url != getattr(settings, "LMS_ROOT_URL", None):
+    if root_url and root_url != getattr(settings, "LMS_ROOT_URL", None):
         return redirect(root_url)
 
     domain = request.headers.get('Host')
@@ -88,7 +88,10 @@ def courses(request):
     if use_catalog_mfe():
         return redirect(f'{settings.CATALOG_MICROFRONTEND_URL}/courses', permanent=True)
 
-    return redirect(marketing_link('COURSES'), permanent=True)
+    courses_url = marketing_link('COURSES')
+    if courses_url != '#':
+        return redirect(courses_url, permanent=True)
+    return redirect('/')
 
 
 def _footer_static_url(request, name):
