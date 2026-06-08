@@ -42,6 +42,7 @@ SHIB_ERROR_STR = "The currently logged-in user account does not have permission 
 
 
 @ddt.ddt
+@patch.dict(settings.FEATURES, {'ENABLE_COURSE_HOME_REDIRECT': False})
 class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTrackingTestCase, MilestonesTestCaseMixin):
     """
     Tests about xblock.
@@ -113,6 +114,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         resp = self.client.get(url)
         self.assertRedirects(resp, reverse('dashboard'), fetch_redirect_response=False)
 
+    @patch.dict(settings.FEATURES, {'ENABLE_COURSE_HOME_REDIRECT': True})
     def test_logged_in_marketing(self):
         self.setup_user()
         url = reverse('about_course', args=[str(self.course.id)])
@@ -208,6 +210,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
             self.assertContains(resp, "Enroll Now")
 
 
+@patch.dict(settings.FEATURES, {'ENABLE_COURSE_HOME_REDIRECT': False})
 class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the course about page
@@ -251,6 +254,7 @@ class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertContains(resp, self.xml_data)
 
 
+@patch.dict(settings.FEATURES, {'ENABLE_COURSE_HOME_REDIRECT': False})
 class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     This test case will check the About page when a course has a capped enrollment
@@ -293,6 +297,7 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleSt
         self.assertNotContains(resp, REG_STR)
 
 
+@patch.dict(settings.FEATURES, {'ENABLE_COURSE_HOME_REDIRECT': False})
 class AboutWithInvitationOnly(SharedModuleStoreTestCase):
     """
     This test case will check the About page when a course is invitation only.
@@ -332,6 +337,7 @@ class AboutWithInvitationOnly(SharedModuleStoreTestCase):
         self.assertContains(resp, REG_STR)
 
 
+@patch.dict(settings.FEATURES, {'ENABLE_COURSE_HOME_REDIRECT': False})
 class AboutWithClosedEnrollment(ModuleStoreTestCase):
     """
     This test case will check the About page for a course that has enrollment start/end
@@ -368,6 +374,7 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
 
 
 @ddt.ddt
+@patch.dict(settings.FEATURES, {'ENABLE_COURSE_HOME_REDIRECT': False})
 class AboutSidebarHTMLTestCase(SharedModuleStoreTestCase):
     """
     This test case will check the About page for the content in the HTML sidebar.
