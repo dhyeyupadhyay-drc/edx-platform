@@ -135,7 +135,6 @@ from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from xmodule.course_block import (
-    CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     COURSE_VISIBILITY_PUBLIC,
     COURSE_VISIBILITY_PUBLIC_OUTLINE,
 )
