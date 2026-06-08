@@ -221,7 +221,6 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.factory = RequestFactory()
 
     @patch('common.djangoapps.student.views.management.render_to_response', RENDER_MOCK)
-    @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_discovery_off(self):
         """
@@ -233,19 +232,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         # assert that the course discovery UI is not present
         self.assertNotContains(response, 'Search for a course')
 
-        # check the /courses view
-        response = self.client.get(reverse('courses'))
-        assert response.status_code == 200
-
-        # assert that the course discovery UI is not present
-        self.assertNotContains(response, 'Search for a course')
-        self.assertNotContains(response, '<aside aria-label="Refine Your Search" class="search-facets phone-menu">')
-
-        # make sure we have the special css class on the section
-        self.assertContains(response, '<div class="courses no-course-discovery"')
-
     @patch('common.djangoapps.student.views.management.render_to_response', RENDER_MOCK)
-    @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': True})
     def test_course_discovery_on(self):
         """
@@ -257,17 +244,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         # assert that the course discovery UI is not present
         self.assertContains(response, 'Search for a course')
 
-        # check the /courses view
-        response = self.client.get(reverse('courses'))
-        assert response.status_code == 200
-
-        # assert that the course discovery UI is present
-        self.assertContains(response, 'Search for a course')
-        self.assertContains(response, '<aside aria-label="Refine Your Search" class="search-facets phone-menu">')
-        self.assertContains(response, '<div class="courses"')
-
     @patch('common.djangoapps.student.views.management.render_to_response', RENDER_MOCK)
-    @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_cards_sorted_by_default_sorting(self):
         response = self.client.get('/')
@@ -280,19 +257,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         assert context['courses'][1].id == self.starting_later.id
         assert context['courses'][2].id == self.course_with_default_start_date.id
 
-        # check the /courses view
-        response = self.client.get(reverse('courses'))
-        assert response.status_code == 200
-        ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
-        assert template == 'courseware/courses.html'
-
-        # by default the courses will be sorted by their creation dates, earliest first.
-        assert context['courses'][0].id == self.starting_earlier.id
-        assert context['courses'][1].id == self.starting_later.id
-        assert context['courses'][2].id == self.course_with_default_start_date.id
-
     @patch('common.djangoapps.student.views.management.render_to_response', RENDER_MOCK)
-    @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_SORTING_BY_START_DATE': False})
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_cards_sorted_by_start_date_disabled(self):
@@ -306,38 +271,13 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         assert context['courses'][1].id == self.starting_earlier.id
         assert context['courses'][2].id == self.course_with_default_start_date.id
 
-        # check the /courses view as well
-        response = self.client.get(reverse('courses'))
-        assert response.status_code == 200
-        ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
-        assert template == 'courseware/courses.html'
-
-        # now the courses will be sorted by their announcement dates.
-        assert context['courses'][0].id == self.starting_later.id
-        assert context['courses'][1].id == self.starting_earlier.id
-        assert context['courses'][2].id == self.course_with_default_start_date.id
-
-    @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
-    def test_invisible_courses_are_not_displayed(self):
-        response = self.client.get(reverse('courses'))  # noqa: F841
-        ((_template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
-
-        rendered_ids = [course.id for course in context["courses"]]
-        assert self.course_with_none_visibility.id not in rendered_ids
-        assert self.course_with_about_visibility.id not in rendered_ids
-
 
 class IndexPageProgramsTests(SiteMixin, ModuleStoreTestCase):
     """
     Tests for Programs List in Marketing Pages.
     """
     def test_get_programs_with_type_called(self):
-        views = [
-            (reverse('root'), 'common.djangoapps.student.views.management.get_programs_with_type'),
-            (reverse('courses'), 'lms.djangoapps.courseware.views.views.get_programs_with_type'),
-        ]
-        for url, dotted_path in views:
-            with patch(dotted_path) as mock_get_programs_with_type:
-                response = self.client.get(url)
-                assert response.status_code == 200
-                mock_get_programs_with_type.assert_called_once()
+        with patch('common.djangoapps.student.views.management.get_programs_with_type') as mock_get_programs_with_type:
+            response = self.client.get(reverse('root'))
+            assert response.status_code == 200
+            mock_get_programs_with_type.assert_called_once()

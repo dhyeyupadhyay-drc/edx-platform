@@ -69,10 +69,10 @@ def index(request):
         return student_views.index(request, user=request.user)
     except NoReverseMatch:
         log.error(
-            f'https is not a registered namespace Request from {domain}',
-            f'request_site= {request.site.__dict__}',
-            f'Auth Status= {request.user.is_authenticated}',
-            f'Request Meta= {request.META}'
+            f'NoReverseMatch on index view for domain {domain}; '
+            f'request_site={getattr(request, "site", None)}; '
+            f'Auth Status={request.user.is_authenticated}; '
+            f'Request Meta={request.META}'
         )
         raise
 
@@ -81,9 +81,8 @@ def index(request):
 @cache_if_anonymous()
 def courses(request):
     """
-    Render the "find courses" page. If the marketing site is enabled, redirect
-    to that. Otherwise, if subdomain branding is on, this is the university
-    profile page. Otherwise, it's the edX courseware.views.views.courses page
+    Redirect to the "find courses" page. Uses the catalog MFE or the marketing
+    site COURSES URL if configured; falls back to the site root.
     """
     if use_catalog_mfe():
         return redirect(f'{settings.CATALOG_MICROFRONTEND_URL}/courses', permanent=True)

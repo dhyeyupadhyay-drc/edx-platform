@@ -88,45 +88,6 @@ class TestComprehensiveThemeLMS(TestCase):
         # This string comes from the default dashboard.html template.
         self.assertContains(resp, "Explore courses")
 
-    @with_comprehensive_theme("test-theme")
-    def test_include_default_template(self):
-        """
-        Test that theme template can include template which is not part of the theme.
-        """
-        self._login()
-        courses_url = reverse('courses')
-        resp = self.client.get(courses_url)
-        assert resp.status_code == 200
-        # The courses.html template includes the error-message.html template.
-        # Verify that the error message is included in the output.
-        self.assertContains(resp, "this module is temporarily unavailable")
-
-    @with_comprehensive_theme("test-theme")
-    def test_include_overridden_template(self):
-        """
-        Test that theme template can include template which is overridden in the active theme.
-        """
-        self._login()
-        courses_url = reverse('courses')
-        resp = self.client.get(courses_url)
-        assert resp.status_code == 200
-        # The courses.html template includes the progress.html file, which is overriden in the theme.
-        self.assertContains(resp, "This overrides the courseware/progress.html template.")
-
-    @with_comprehensive_theme("test-theme")
-    def test_include_custom_template(self):
-        """
-        Test that theme template can include template which is only present in the theme, but has no standard LMS
-        equivalent.
-        """
-        self._login()
-        courses_url = reverse('courses')
-        resp = self.client.get(courses_url)
-        assert resp.status_code == 200
-        # The courses.html template includes the test-theme.custom.html file.
-        # Verify its contents are present in the output.
-        self.assertContains(resp, "This is a custom template.")
-
 
 @skip_unless_lms
 class TestComprehensiveThemeDisabledLMS(TestCase):
