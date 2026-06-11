@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "overrides": {
     "postcss": "^8.4.38",
-    "socket.io-parser": "3.4.4"
+    "socket.io-parser": "3.4.4",
+    "serialize-javascript": "7.0.3"
   },
   "repository": "https://github.com/openedx/edx-platform",
   "scripts": {
